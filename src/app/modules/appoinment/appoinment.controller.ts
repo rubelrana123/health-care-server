@@ -3,9 +3,11 @@ import catchAsync from "../../shared/catchAsync";
  
 import { IJWTPayload } from "../../types";
 import sendResponse from "../../shared/sendResponse";
-import { AppointmentService } from "./appoinment.service";
-import { get } from "http";
+ 
+ 
 import pick from "../../helpers/pick";
+import { AppointmentService } from "./appoinment.service";
+import { AppointmentStatus } from "@prisma/client";
  
 
 
@@ -35,7 +37,21 @@ const getMyAppointment = catchAsync(async (req: Request & { user?: IJWTPayload }
     })
 })
 
+const updateAppointmentStatus = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
+    const appointmentId = req.params.id;
+    const status : AppointmentStatus = req.body.status;
+    const result = await AppointmentService.updateAppointmentStatus(req.user as IJWTPayload, appointmentId, status);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Appointment status updated successfully!",
+        data: result
+    })
+})
+
 export const AppointmentController = {
     createAppointment,
-    getMyAppointment
+    getMyAppointment,
+    updateAppointmentStatus
 }
