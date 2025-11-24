@@ -33,9 +33,9 @@ router.get(
  
 
 router.patch(
-    "/:id",
-    auth(UserRole.ADMIN),
-    PatientController.updatePatientById
+    "/",
+    auth(UserRole.PATIENT),
+    PatientController.updateIntoDB
 )
 
 router.delete(
