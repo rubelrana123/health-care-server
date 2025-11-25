@@ -4,6 +4,7 @@ import sendResponse from "../../shared/sendResponse";
 import { UserService } from "./user.service";
 import pick from "../../helpers/pick";
 import { userFilterableFields } from "./user.constant";
+import { IJWTPayload } from "../../types";
 
 const createPatient = catchAsync(async (req: Request, res: Response) => {
     console.log("hello i am controller", req)
@@ -53,9 +54,22 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
         data: result.data
     })
 })
+
+const getMyProfile = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
+    const user = req.user;
+    const result = await UserService.getMyProfile(user as IJWTPayload);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "User profile retrive successfully!",
+        data: result
+    })
+});
+
 export const UserController = {
     createPatient,  
     createAdmin,
     createDoctor,
-    getAllFromDB
+    getAllFromDB,
+    getMyProfile
 };

@@ -7,7 +7,7 @@ import { SpecialtiesRoutes } from '../modules/specialties/specialties.routes';
 import { DoctorRoutes } from '../modules/doctor/doctor.route';
 import { PatientRoutes } from '../modules/patient/patient.route';
 import { AdminRoutes } from '../modules/admin/admin.route';
-import path from 'path';
+ 
 import { AppointmentRoutes } from '../modules/appoinment/appoinment.route';
 import { PrescriptionRoutes } from '../modules/prescription/prescription.route';
 import { ReviewRoutes } from '../modules/review/review.route';

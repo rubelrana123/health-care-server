@@ -15,5 +15,14 @@ router.post(
     auth(UserRole.DOCTOR, UserRole.ADMIN),
     DoctorScheduleController.insertIntoDB
 )
+// Get All Doctor Schedules (Admin Only)
+
+// Retrieve all doctor schedules with pagination, searching, filtering, and sorting functionality.
+// Access: Admin only.
+router.get(
+    "/",
+    auth(UserRole.ADMIN), 
+    DoctorScheduleController.getAllDoctorSchedules
+);
 
 export const doctorScheduleRoutes = router;

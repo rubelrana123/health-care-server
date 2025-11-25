@@ -8,6 +8,7 @@ import sendResponse from "../../shared/sendResponse";
 import pick from "../../helpers/pick";
 import { AppointmentService } from "./appoinment.service";
 import { AppointmentStatus } from "@prisma/client";
+import { appointmentFilterableFields } from "./appoinment.constant";
  
 
 
@@ -50,8 +51,22 @@ const updateAppointmentStatus = catchAsync(async (req: Request & { user?: IJWTPa
     })
 })
 
+const getAllAppointments = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
+     const filters = pick(req.query, appointmentFilterableFields)
+    const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+    const result = await AppointmentService.getAllAppointments(filters, options);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Appointment retrieval successfully',
+        meta: result.meta,
+        data: result.data,
+    });
+});
+
 export const AppointmentController = {
     createAppointment,
     getMyAppointment,
-    updateAppointmentStatus
+    updateAppointmentStatus,
+    getAllAppointments
 }

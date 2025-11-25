@@ -24,4 +24,15 @@ router.patch(
     AppointmentController.updateAppointmentStatus
  )
 
+// task //  Get All Appointments (Admin Only)
+
+// Retrieve all appointments with pagination, searching, filtering, and sorting functionality.
+// Access: Admin only.
+
+router.get(
+    "/",
+    auth(UserRole.ADMIN),
+    AppointmentController.getAllAppointments
+)
+
 export const AppointmentRoutes = router;

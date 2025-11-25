@@ -44,6 +44,15 @@ router.get("/",
     auth(UserRole.ADMIN),
     
     UserController.getAllFromDB)
-export const userRoutes = router;
+ 
 
+    router.get(
+    '/my-profile',
+    auth(
+        UserRole.ADMIN,
+        UserRole.DOCTOR,
+        UserRole.PATIENT
+    ),
+    UserController.getMyProfile
+);
  export const UserRoutes = router;
