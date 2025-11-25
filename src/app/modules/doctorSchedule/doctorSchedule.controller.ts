@@ -5,6 +5,7 @@ import { DoctorScheduleService } from "./doctorSchedule.service";
 import { IJWTPayload } from "../../types";
 import pick from "../../helpers/pick";
 import { scheduleFilterableFields } from "./doctorSchedule.constant";
+import { prisma } from "../../shared/prisma";
  
 const insertIntoDB = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
     const user = req.user;
@@ -32,9 +33,36 @@ const getAllDoctorSchedules = catchAsync(async (req: Request & { user?: IJWTPayl
     });
 });
 
- 
+ //    * Retrieve the authenticated doctor’s own schedules with **pagination**, **searching**, **filtering**, and **sorting** functionality.
+const getMySchedules = catchAsync(async (req: Request & {user? : IJWTPayload}, res: Response) => {
+    const filters = pick(req.query, scheduleFilterableFields) // searching , filtering
+       const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]) // pagination and sorting
+      const result = await DoctorScheduleService.getMySchedules(req?.user as IJWTPayload, filters, options);
+
+       sendResponse(res, {
+           statusCode: 200,
+           success: true,
+           message: "My Schedules fetched successfully!",
+           data: result
+       })
+   });
+
+
+const deleteFromDB = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
+    const scheduleId = req.params.id;
+    const result = await DoctorScheduleService.deleteFromDB(req.user as IJWTPayload, scheduleId as string );
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Doctor Schedule deleted successfully!",
+        data: result
+    })
+}       );  
 
 export const DoctorScheduleController = {
     insertIntoDB,
-    getAllDoctorSchedules
+    getAllDoctorSchedules,
+    getMySchedules,
+    deleteFromDB
 }
