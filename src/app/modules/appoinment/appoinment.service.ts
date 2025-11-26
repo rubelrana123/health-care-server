@@ -253,10 +253,15 @@ const getAllAppointments = async (filters: any, options: IOptions) => {
         data: result,
     };
 };
-
 const cancelUnpaidAppointments = async () => {
+    // Calculate the timestamp of 30 minutes ago
+    // Date.now() gives current time in milliseconds.
+    // 30 * 60 * 1000 = 30 minutes in ms.
     const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000);
 
+    // Find all appointments that:
+    // - were created 30 mins ago or earlier (createdAt <= thirtyMinAgo)
+    // - still have paymentStatus = UNPAID
     const unPaidAppointments = await prisma.appointment.findMany({
         where: {
             createdAt: {
@@ -264,28 +269,38 @@ const cancelUnpaidAppointments = async () => {
             },
             paymentStatus: PaymentStatus.UNPAID
         }
-    })
+    });
 
+    // Extract only the IDs of those unpaid appointments into an array
     const appointmentIdsToCancel = unPaidAppointments.map(appointment => appointment.id);
 
+    // Run everything inside a transaction.
+    // This means: if one task fails, nothing is saved.
     await prisma.$transaction(async (tnx) => {
+
+        // Delete all payment records linked to those appointment IDs
         await tnx.payment.deleteMany({
             where: {
                 appointmentId: {
                     in: appointmentIdsToCancel
                 }
             }
-        })
+        });
 
+        // Delete all the unpaid appointments themselves
         await tnx.appointment.deleteMany({
             where: {
                 id: {
                     in: appointmentIdsToCancel
                 }
             }
-        })
+        });
 
+        // Loop through each unpaid appointment and free the doctor’s schedule
         for (const unPaidAppointment of unPaidAppointments) {
+
+            // doctorSchedules uses a compound unique key: doctorId + scheduleId
+            // So we update that specific schedule slot and mark it unbooked
             await tnx.doctorSchedules.update({
                 where: {
                     doctorId_scheduleId: {
@@ -294,16 +309,17 @@ const cancelUnpaidAppointments = async () => {
                     }
                 },
                 data: {
-                    isBooked: false
+                    isBooked: false  // free the schedule
                 }
-            })
+            });
         }
-    })
+    });
 };
 
 export const AppointmentService = {
     createAppointment,
     getMyAppointment,
     updateAppointmentStatus,
-    getAllAppointments
+    getAllAppointments,
+    cancelUnpaidAppointments
 };

@@ -6,6 +6,8 @@ import config from './config';
 import router from './app/routes';
 import cookieParser from "cookie-parser"
 import { PaymentController } from './app/modules/payment/payment.controller';
+import cron from 'node-cron';
+import { AppointmentService } from './app/modules/appoinment/appoinment.service';
 
 const app: Application = express();
 
@@ -14,6 +16,16 @@ app.post(
     express.raw({ type: "application/json" }),
     PaymentController.handleStripeWebhookEvent
 );
+
+cron.schedule('* * * * *', () => {
+    try {
+      console.log('running a task every minute', new Date().toISOString());
+     AppointmentService.cancelUnpaidAppointments()
+  } catch (error) {
+    console.error('Error cancelling unpaid appointments:', error);
+  }
+ 
+});
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true

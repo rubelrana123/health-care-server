@@ -64,6 +64,7 @@ const getAllAppointments = catchAsync(async (req: Request & { user?: IJWTPayload
     });
 });
 
+ 
 export const AppointmentController = {
     createAppointment,
     getMyAppointment,

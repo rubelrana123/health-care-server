@@ -10,6 +10,10 @@ router.post(
     auth(UserRole.PATIENT),
     ReviewController.insertIntoDB
 );
-
+router.get(
+    '/',
+    // auth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+    ReviewController.getAllFromDB
+);
 
 export const ReviewRoutes = router;
