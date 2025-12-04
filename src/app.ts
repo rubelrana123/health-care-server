@@ -17,7 +17,8 @@ app.post(
     PaymentController.handleStripeWebhookEvent
 );
 
-cron.schedule('* * * * *', () => {
+//disable for testing purpose
+cron.schedule('*', () => {
     try {
       console.log('running a task every minute', new Date().toISOString());
      AppointmentService.cancelUnpaidAppointments()
@@ -27,7 +28,7 @@ cron.schedule('* * * * *', () => {
  
 });
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'http://localhost:3001',
     credentials: true
 }));
 
